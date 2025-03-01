@@ -3,22 +3,6 @@
 # и вывода списка текущих (не выполненных) задач.
 
 class Task():
-    def __init__(self, description, deadline, status = False):
-        self.description = description
-        self.deadline = deadline
-        self.status = status
-
-    # Отметить выполненную задачу
-    def mark_as_done(self):
-        self.status = True
-        print(f"Задача {self.description} выполнена. ")
-
-    # Строковое представление задачи
-    def __str__(self):
-        status_text = "Выполнена" if self.status else "Не выполнена"
-        return f"Описание задачи: {self.description} \n Срок выполнения задачи: {self.deadline} \n Статус задачи: {status_text}"
-
-class TaskManager():
     def __init__(self):
         self.tasks = []
 
@@ -28,8 +12,7 @@ class TaskManager():
         status_input = input("Введите 1, если задача выполнена или нажмите Enter")
         status = status_input == "1"
 
-        new_task = Task(description, deadline, status)
-        self.tasks.append(new_task)
+        self.tasks.append({"description" : description, "deadline" : deadline, "status" : status})
         print("Задача добавлена!")
 
     def mark_task_as_done(self):
@@ -38,14 +21,14 @@ class TaskManager():
             return
 
         print("\nВыберите номер задачи для отметки как выполненной:")
-        for i, task in enumerate(self.tasks, start=1):
-            status_text = "Выполнена" if task.status else "Не выполнена"
-            print(f"{i}. {task.description} - {status_text}")
+        for i, task in enumerate(self.tasks, start = 1):
+            status_text = "Выполнена" if task["status"] else "Не выполнена"
+            print(f"{i}. {task["description"]} - {status_text}")
 
         try:
             task_number = int(input("Введите номер задачи: ")) - 1
             if 0 <= task_number < len(self.tasks):
-                self.tasks[task_number].mark_as_done()
+                self.tasks[task_number]["status"] = True
             else:
                 print("Ошибка: некорректный номер задачи.")
         except ValueError:
@@ -53,14 +36,14 @@ class TaskManager():
 
     def current_tasks(self):
         print("Текущие задачи: ")
-        active_tasks = [i for i in self.tasks if not i.status]
+        active_tasks = [task for task in self.tasks if not task["status"]]
         if active_tasks:
-            for i in active_tasks:
-                print(i)
+            for i, task in enumerate(active_tasks, start = 1):
+                print(f"{i}. {task['description']} (Срок: {task['deadline']}) Не выполнена")
         else:
-            print("Нет активных задач! ")
+            print("Нет активных задач!")
 
-task_manager = TaskManager()
+task = Task()
 
 while True:
     print("\nВыберите действие:")
@@ -72,11 +55,11 @@ while True:
     choice = input("Введите номер действия: ")
 
     if choice == "1":
-        task_manager.add_new_task()
+        task.add_new_task()
     elif choice == "2":
-        task_manager.mark_task_as_done()
+        task.mark_task_as_done()
     elif choice == "3":
-        task_manager.current_tasks()
+        task.current_tasks()
     elif choice == "4":
         print(" Выход из программы.")
         break
